@@ -1,12 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Toolbar from "../components/Toolbar";
+import TableView from "../components/TableView";
+import type { Track } from "../components/Track";
 
 export default function MusicPage() {
     const [seed, setSeed] = useState(1);
     const [language, setLanguage] = useState("en");
     const [likes, setLikes] = useState(10);
 
-    const audioUrl = `http://localhost:5233/api/music/mp3?seed=${seed}`;
+    const [page, setPage] = useState(1);
+    const [tracks, setTracks] = useState<Track[]>([]);
+    const [totalPages, setTotalPages] = useState(1);
+
+    useEffect(() => {
+        const fetchTracks = async () => {
+            try {
+                const res = await fetch(
+                    `http://localhost:5233/api/music/songs?seed=${seed}&likes=${likes}&lang=${language}&page=${page}&pageSize=${10}`
+                );
+                const data = await res.json();
+
+                const tracksWithAudio: Track[] = (data.tracks as Track[]).map(t => ({
+                    ...t,
+                    audioUrl: `http://localhost:5233/api/music/mp3?seed=${seed}&trackIndex=${t.index}`
+                }));
+
+                setTracks(tracksWithAudio);
+                setTotalPages(data.totalPages);
+            } catch (err) {
+                console.error("Failed to fetch tracks", err);
+            }
+        };
+        fetchTracks();
+    }, [seed, likes, language, page]);
 
     return (
         <div style={{ padding: "20px" }}>
@@ -20,16 +46,16 @@ export default function MusicPage() {
                     setLanguage(language);
                     setSeed(seed);
                     setLikes(likes);
+                    setPage(1);
                 }}
             />
 
-            <div>
-                <audio key={audioUrl} controls src={audioUrl} />
-                <br />
-                <a href={audioUrl} download>
-                    Download
-                </a>
-            </div>
+            <TableView
+                tracks={tracks}
+                page={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+            />
         </div>
     );
 }
