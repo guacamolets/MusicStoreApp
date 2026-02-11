@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Client\" />
+    <Folder Include="Client\src\components\" />
     <Folder Include="wwwroot\soundfonts\" />
   </ItemGroup>
 

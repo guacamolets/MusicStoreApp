@@ -9,11 +9,11 @@ namespace MusicStoreApp.Api.Services
 {
     public class MusicGenerator
     {
-        public byte[] GenerateMp3(int seed = 1, int durationSeconds = 10)
+        public byte[] GenerateMp3(int seed = 1)
         {
             const int sampleRate = 44100;
 
-            byte[] midiBytes = GenerateMidi(seed, durationSeconds);
+            byte[] midiBytes = GenerateMidi(seed);
 
             using var midiStream = new MemoryStream(midiBytes);
             var midiFile = new MeltySynth.MidiFile(midiStream);
@@ -51,7 +51,7 @@ namespace MusicStoreApp.Api.Services
             return mp3Stream.ToArray();
         }
 
-        public byte[] GenerateMidi(int seed, int durationSeconds = 10, int tempo = 120)
+        public byte[] GenerateMidi(int seed)
         {
             var rand = new Random(seed);
 
@@ -67,7 +67,7 @@ namespace MusicStoreApp.Api.Services
             int[] cMajor = { 60, 62, 64, 65, 67, 69, 71 };
             int[] cBass = { 36, 38, 40, 41, 43, 45, 47 };
 
-            for (int i = 0; i < durationSeconds; i++)
+            for (int i = 0; i < rand.Next(10, 60); i++)
             {
                 int noteMelody = cMajor[rand.Next(cMajor.Length)];
                 int noteBass = cBass[rand.Next(cBass.Length)];
@@ -76,6 +76,7 @@ namespace MusicStoreApp.Api.Services
                 bassNotes.Add(new Note((SevenBitNumber)noteBass, new SevenBitNumber(100)));
             }
 
+            int tempo = rand.Next(60, 120);
             AddNotesSequentially(trackChunks[0], melodyNotes, tempo);
             AddNotesSequentially(trackChunks[1], bassNotes, tempo);
 

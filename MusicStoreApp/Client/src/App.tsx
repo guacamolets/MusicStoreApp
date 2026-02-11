@@ -1,6 +1,6 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom"
 import './App.css'
-import MusicPage from './Pages/MusicPage'
+import MusicPage from './pages/MusicPage'
 
 function App() {
   return (

@@ -1,38 +1,35 @@
-import {useState} from "react"
+import { useState } from "react";
+import Toolbar from "../components/Toolbar";
 
 export default function MusicPage() {
     const [seed, setSeed] = useState(1);
-    const [duration, setDuration] = useState(10);
-    const [audioUrl, setAudioUrl] = useState<string | null>(null);
+    const [language, setLanguage] = useState("en");
+    const [likes, setLikes] = useState(10);
 
-    const generateMusic = () => {
-        const url = `http://localhost:5233/api/music/mp3?seed=${seed}&duration=${duration}`;
-        setAudioUrl(url);
-    };
+    const audioUrl = `http://localhost:5233/api/music/mp3?seed=${seed}`;
 
     return (
-        <div style={{padding: "20px"}}>
+        <div style={{ padding: "20px" }}>
             <h2>Music Generator</h2>
 
-            <div>
-                <label>Seed:</label>
-                <input type="number" value={seed} onChange={(e)=>setSeed(Number(e.target.value))}/>
-            </div>
+            <Toolbar
+                language={language}
+                seed={seed}
+                likes={likes}
+                onChange={({ language, seed, likes }) => {
+                    setLanguage(language);
+                    setSeed(seed);
+                    setLikes(likes);
+                }}
+            />
 
             <div>
-                <label>Duration:</label>
-                <input type="number" value={duration} onChange={(e)=>setDuration(Number(e.target.value))}/>
+                <audio key={audioUrl} controls src={audioUrl} />
+                <br />
+                <a href={audioUrl} download>
+                    Download
+                </a>
             </div>
-
-            <button onClick={generateMusic}>Generate</button>
-
-            {audioUrl && (
-                <div style={{marginTop:"20px"}}>
-                    <audio controls src={audioUrl}/>
-                    <br />
-                    <a href={audioUrl} download>Download</a>
-                </div>
-            )}
         </div>
     );
 }

@@ -16,16 +16,16 @@ public class MusicController : ControllerBase
     }
 
     [HttpGet("mp3")]
-    public IActionResult GetMp3(int seed = 1, int duration = 10)
+    public IActionResult GetMp3(int seed = 1)
     {
-        var mp3 = _generator.GenerateMp3(seed, duration);
+        var mp3 = _generator.GenerateMp3(seed);
         return File(mp3, "audio/mpeg", $"song_{seed}.mp3");
     }
 
     [HttpGet("midi")]
-    public IActionResult GetMidi(int seed = 1, int duration = 10)
+    public IActionResult GetMidi(int seed = 1)
     {
-        var data = _generator.GenerateMidi(seed, duration);
+        var data = _generator.GenerateMidi(seed);
         return File(data, "audio/midi", $"song_{seed}.midi");
     }
 }
