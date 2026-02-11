@@ -10,6 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<SongGenerator>();
+builder.Services.AddScoped<MusicGenerator>();
 
 var app = builder.Build();
 
