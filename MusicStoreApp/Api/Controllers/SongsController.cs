@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MusicStoreApp.Api.Dto;
 using MusicStoreApp.Api.Services;
 
 namespace MusicStoreApp.Api.Controllers;
@@ -8,10 +7,15 @@ namespace MusicStoreApp.Api.Controllers;
 [Route("api/[controller]")]
 public class SongsController : ControllerBase
 {
-    private readonly SongGenerator _generator = new();
+    private readonly SongGenerator _generator;
+
+    public SongsController(SongGenerator generator)
+    {
+        _generator = generator;
+    }
 
     [HttpGet]
-    public SongsPageDto GetSongs(
+    public IActionResult GetSongs(
         int page = 1,
         int pageSize = 20,
         long seed = 1,
@@ -19,9 +23,6 @@ public class SongsController : ControllerBase
         double likes = 0
     )
     {
-        var items = Enumerable.Range(0, pageSize)
-            .Select(i => _generator.Generate(page - 1 + i, page, seed, lang, likes)).ToList();
-
-        return new SongsPageDto(page, items);
+        return Ok(_generator.Generate((page - 1) * pageSize + 1, page, pageSize, seed, lang, likes));
     }
 }

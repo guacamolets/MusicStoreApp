@@ -1,13 +1,15 @@
 ﻿using Bogus;
 using MusicStoreApp.Api.Dto;
+using MusicStoreApp.Api.Localization;
 
 namespace MusicStoreApp.Api.Services
 {
     public class SongGenerator
     {
-        public SongDto Generate(
+        public IEnumerable<SongDto> Generate(
             int index,
             int page,
+            int pageSize,
             long userSeed,
             string locale,
             double avgLikes
@@ -18,14 +20,11 @@ namespace MusicStoreApp.Api.Services
 
             Randomizer.Seed = contentRandom;
 
-            var faker = new Faker(locale);
-
-            var title = faker.Hacker.Phrase();
-            var artist = faker.Name.FullName();
-            var genre = faker.Music.Genre();
+            var normalizedLocale = locale.Split('-')[0];
+            var faker = new Faker(normalizedLocale);
 
             var album = contentRandom.Next(0, 4) == 0
-                ? "Single"
+                ? AlbumConfig.SingleByLocale.GetValueOrDefault(normalizedLocale, "Single")
                 : faker.Company.CompanyName();
 
             var likesRandom = new Random((int)(userSeed + index));
@@ -35,14 +34,18 @@ namespace MusicStoreApp.Api.Services
 
             int likes = baseLikes + (extra ? 1 : 0);
 
-            return new SongDto(
-                Index: index,
-                Title: title,
-                Artist: artist,
-                Album: album,
-                Genre: genre,
-                Likes: likes
-            );
+            for (int i = 0; i < pageSize; i++)
+            {
+                yield return new SongDto(
+                    Index: index + i,
+                    Title: faker.Hacker.Phrase(),
+                    Artist: faker.Name.FullName(),
+                    Genre: faker.Music.Genre(),
+                    Album: album,
+                    Likes: likes,
+                    CoverUrl: $"https://picsum.photos/seed/{$"{userSeed}-{page}-{i}"}/300/300"
+                );
+            }
         }
     }
 }
