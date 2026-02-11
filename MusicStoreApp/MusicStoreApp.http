@@ -1,6 +1,6 @@
 @MusicStoreApp_HostAddress = http://localhost:5233
 
-GET {{MusicStoreApp_HostAddress}}/weatherforecast/
+GET {{MusicStoreApp_HostAddress}}/musicstoreapp/
 Accept: application/json
 
 ###
