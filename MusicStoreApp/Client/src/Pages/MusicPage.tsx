@@ -6,7 +6,7 @@ export default function MusicPage() {
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
     const generateMusic = () => {
-        const url = `http://localhost:5233/api/music/midi?seed=${seed}&duration=${duration}`;
+        const url = `http://localhost:5233/api/music/mp3?seed=${seed}&duration=${duration}`;
         setAudioUrl(url);
     };
 
@@ -30,7 +30,7 @@ export default function MusicPage() {
                 <div style={{marginTop:"20px"}}>
                     <audio controls src={audioUrl}/>
                     <br />
-                    <a href={audioUrl} download>Download MIDI</a>
+                    <a href={audioUrl} download>Download</a>
                 </div>
             )}
         </div>

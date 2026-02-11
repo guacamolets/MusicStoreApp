@@ -13,11 +13,19 @@
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.5" />
     <PackageReference Include="Melanchall.DryWetMIDI" Version="8.0.3" />
+    <PackageReference Include="MeltySynth" Version="2.4.1" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="NAudio.Lame" Version="2.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Client\" />
+    <Folder Include="wwwroot\soundfonts\" />
   </ItemGroup>
+
+<ItemGroup>
+    <None Include="wwwroot\soundfonts\general.sf2" CopyToOutputDirectory="Always" />
+</ItemGroup>
 
 </Project>

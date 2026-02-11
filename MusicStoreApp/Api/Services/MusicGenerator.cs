@@ -1,12 +1,57 @@
 ﻿using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
+using NAudio.Lame;
+using NAudio.Wave;
+using MeltySynth;
 
 namespace MusicStoreApp.Api.Services
 {
     public class MusicGenerator
     {
-        public byte[] Generate(int seed, int durationSeconds = 10, int tempo = 120)
+        public byte[] GenerateMp3(int seed = 1, int durationSeconds = 10)
+        {
+            const int sampleRate = 44100;
+
+            byte[] midiBytes = GenerateMidi(seed, durationSeconds);
+
+            using var midiStream = new MemoryStream(midiBytes);
+            var midiFile = new MeltySynth.MidiFile(midiStream);
+
+            var soundFont = new SoundFont("wwwroot/soundfonts/general.sf2");
+            var synthesizer = new Synthesizer(soundFont, sampleRate);
+            var sequencer = new MidiFileSequencer(synthesizer);
+
+            sequencer.Play(midiFile, false);
+
+            int totalSamples = (int)(midiFile.Length.TotalSeconds * sampleRate);
+
+            float[] left = new float[totalSamples];
+            float[] right = new float[totalSamples];
+
+            sequencer.Render(left, right);
+
+            using var mp3Stream = new MemoryStream();
+            var waveFormat = new WaveFormat(sampleRate, 16, 2);
+
+            using (var writer = new LameMP3FileWriter(mp3Stream, waveFormat, 192))
+            {
+                for (int i = 0; i < totalSamples; i++)
+                {
+                    short l = (short)(left[i] * short.MaxValue);
+                    short r = (short)(right[i] * short.MaxValue);
+
+                    writer.WriteByte((byte)(l & 0xff));
+                    writer.WriteByte((byte)((l >> 8) & 0xff));
+                    writer.WriteByte((byte)(r & 0xff));
+                    writer.WriteByte((byte)((r >> 8) & 0xff));
+                }
+            }
+
+            return mp3Stream.ToArray();
+        }
+
+        public byte[] GenerateMidi(int seed, int durationSeconds = 10, int tempo = 120)
         {
             var rand = new Random(seed);
 
@@ -34,7 +79,7 @@ namespace MusicStoreApp.Api.Services
             AddNotesSequentially(trackChunks[0], melodyNotes, tempo);
             AddNotesSequentially(trackChunks[1], bassNotes, tempo);
 
-            var midiFile = new MidiFile(trackChunks);
+            var midiFile = new Melanchall.DryWetMidi.Core.MidiFile(trackChunks);
             using var ms = new MemoryStream();
 
             midiFile.Write(ms);
