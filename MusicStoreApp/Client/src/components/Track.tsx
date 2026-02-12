@@ -4,5 +4,7 @@ export interface Track {
     artist: string;
     album: string;
     genre: string;
+    likes: number;
+    coverUrl: string;
     audioUrl: string;
 }

@@ -1,9 +1,7 @@
-﻿using MusicStoreApp.Api.Dto;
+﻿namespace MusicStoreApp.Api.Dto;
 
-namespace MusicStoreApp.Api.Dto;
-
-public record SongsPageDto(
-    int Page,
-    int pageSize,
-    IReadOnlyList<SongDto> Items
-);
+public class SongsPageDto
+{
+    public IEnumerable<SongDto> Songs { get; set; } = new List<SongDto>();
+    public int TotalPages { get; set; }
+}

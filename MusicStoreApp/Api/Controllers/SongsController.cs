@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MusicStoreApp.Api.Dto;
 using MusicStoreApp.Api.Services;
 
 namespace MusicStoreApp.Api.Controllers;
@@ -23,6 +24,8 @@ public class SongsController : ControllerBase
         double likes = 0
     )
     {
-        return Ok(_generator.Generate((page - 1) * pageSize + 1, page, pageSize, seed, lang, likes));
+        var songs = _generator.Generate((page - 1) * pageSize + 1, page, pageSize, seed, lang, likes);
+
+        return Ok(new SongsPageDto { Songs = songs, TotalPages = pageSize });
     }
 }
