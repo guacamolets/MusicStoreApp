@@ -6,5 +6,7 @@ export interface Track {
     genre: string;
     likes: number;
     coverUrl: string;
+    reviewAuthor: string;
+    reviewText: string;
     audioUrl: string;
 }

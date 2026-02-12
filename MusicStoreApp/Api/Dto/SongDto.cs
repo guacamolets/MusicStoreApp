@@ -9,5 +9,8 @@ public record SongDto(
 
     int Likes,
 
-    string CoverUrl
+    string CoverUrl,
+
+    string ReviewAuthor,
+    string ReviewText
 );

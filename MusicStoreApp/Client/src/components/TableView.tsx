@@ -1,14 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { type Track } from "./Track";
+import ExpandedRow from "./ExpandedRow";
 
 interface TableProps {
     tracks: Track[];
     page: number;
     totalPages: number;
     onPageChange: (newPage: number) => void;
+    seed: number;
 }
 
-const TableView: React.FC<TableProps> = ({ tracks, page, totalPages, onPageChange }) => {
+const TableView: React.FC<TableProps> = ({ tracks, page, totalPages, onPageChange, seed }) => {
+    const [expandedId, setExpandedId] = useState<number | null>(null);
+
+    const toggleRow = (id: number) => {
+        setExpandedId(prev => (prev === id ? null : id));
+    };
+
     return (
         <div>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -19,25 +27,34 @@ const TableView: React.FC<TableProps> = ({ tracks, page, totalPages, onPageChang
                         <th>Artist</th>
                         <th>Album</th>
                         <th>Genre</th>
-                        <th>Audio</th>
+                        <th>Rating</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {tracks.map((track) => (
-                        <tr key={track.index} style={{ borderBottom: "1px solid #ccc" }}>
-                            <td>{track.index}</td>
-                            <td>{track.title}</td>
-                            <td>{track.artist}</td>
-                            <td>{track.album}</td>
-                            <td>{track.genre}</td>
-                            <td>
-                                <audio controls src={track.audioUrl} />
-                                <br />
-                                <a href={track.audioUrl} download>Download</a>
-                            </td>
-                        </tr>
+                    {tracks.map((track, index) => (
+                        <React.Fragment key={track.index}>
+
+                            <tr onClick={() => toggleRow(track.index)} style={{ cursor: "pointer" }}>
+                                <td>{index + 1}</td>
+                                <td>{track.title}</td>
+                                <td>{track.artist}</td>
+                                <td>{track.album}</td>
+                                <td>{track.genre}</td>
+                                <td>{track.likes}</td>
+                            </tr>
+
+                            {expandedId === track.index && (
+                                <tr>
+                                    <td colSpan={5}>
+                                        <ExpandedRow track={track} seed={seed} />
+                                    </td>
+                                </tr>
+                            )}
+
+                        </React.Fragment>
                     ))}
                 </tbody>
+
             </table>
 
             <div style={{ marginTop: "10px" }}>

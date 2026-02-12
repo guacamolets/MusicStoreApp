@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Toolbar from "../components/Toolbar";
 import TableView from "../components/TableView";
+import GalleryView from "../components/GalleryView";
 import type { Track } from "../components/Track";
 
 export default function MusicPage() {
@@ -11,6 +12,8 @@ export default function MusicPage() {
     const [page, setPage] = useState(1);
     const [tracks, setTracks] = useState<Track[]>([]);
     const [totalPages, setTotalPages] = useState(1);
+
+    const [viewMode, setViewMode] = useState<"table" | "gallery">("table");
 
     useEffect(() => {
         const fetchTracks = async () => {
@@ -36,6 +39,10 @@ export default function MusicPage() {
 
     return (
         <div style={{ padding: "20px" }}>
+
+            <button onClick={() => setViewMode("table")}>Table</button>
+            <button onClick={() => setViewMode("gallery")}>Gallery</button>
+
             <h2>Music Generator</h2>
 
             <Toolbar
@@ -50,12 +57,24 @@ export default function MusicPage() {
                 }}
             />
 
-            <TableView
-                tracks={tracks}
-                page={page}
-                totalPages={totalPages}
-                onPageChange={setPage}
-            />
+            {viewMode === "gallery" && (
+                <GalleryView
+                    key={`${seed}-${likes}-${language}`}
+                    seed={seed}
+                    likes={likes}
+                    language={language}
+                />
+            )}
+
+            {viewMode === "table" && (
+                <TableView
+                    tracks={tracks}
+                    page={page}
+                    totalPages={totalPages}
+                    onPageChange={setPage}
+                    seed={seed}
+                />
+            )}
         </div>
     );
 }
