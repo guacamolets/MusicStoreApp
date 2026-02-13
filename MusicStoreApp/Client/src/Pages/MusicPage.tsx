@@ -3,6 +3,7 @@ import Toolbar from "../components/Toolbar";
 import TableView from "../components/TableView";
 import GalleryView from "../components/GalleryView";
 import type { Track } from "../components/Track";
+import ViewSwitch from "../components/ViewSwitch";
 
 export default function MusicPage() {
     const [seed, setSeed] = useState(1);
@@ -13,7 +14,6 @@ export default function MusicPage() {
     const [tracks, setTracks] = useState<Track[]>([]);
     const [totalPages, setTotalPages] = useState(1);
 
-    const [activeTrackIndex, setActiveTrackIndex] = useState<number | null>(null);
     const [viewMode, setViewMode] = useState<"table" | "gallery">(
         () => (localStorage.getItem("viewMode") as "table" | "gallery") || "table"
     );
@@ -26,7 +26,7 @@ export default function MusicPage() {
         const fetchTracks = async () => {
             try {
                 const res = await fetch(
-                    `/api/songs?seed=${seed}&likes=${likes}&lang=${language}&page=${page}&pageSize=${10}`
+                    `/api/songs?seed=${seed}&likes=${likes}&lang=${language}&page=${page}`
                 );
                 const data = await res.json();
 
@@ -37,7 +37,6 @@ export default function MusicPage() {
 
                 setTracks(tracksWithAudio);
                 setTotalPages(data.totalPages);
-                setActiveTrackIndex(null);
             } catch (err) {
                 console.error("Failed to fetch tracks", err);
             }
@@ -46,12 +45,12 @@ export default function MusicPage() {
     }, [seed, likes, language, page]);
 
     return (
-        <div style={{ padding: "20px" }}>
+        <div style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <ViewSwitch viewMode={viewMode} onChange={setViewMode} />
+            </div>
 
-            <button onClick={() => setViewMode("table")}>Table</button>
-            <button onClick={() => setViewMode("gallery")}>Gallery</button>
-
-            <h2>Music Generator</h2>
+            <h2>Sharpify</h2>
 
             <Toolbar
                 language={language}
@@ -65,26 +64,27 @@ export default function MusicPage() {
                 }}
             />
 
-            {viewMode === "gallery" && (
-                <GalleryView
-                    key={`${seed}-${likes}-${language}`}
-                    seed={seed}
-                    likes={likes}
-                    language={language}
-                    activeTrackIndex={activeTrackIndex}
-                />
-            )}
+            <div className="content-wrapper">
+                {viewMode === "gallery" && (
+                    <GalleryView
+                        key={`${seed}-${likes}-${language}`}
+                        seed={seed}
+                        likes={likes}
+                        language={language}
+                    />
+                )}
 
-            {viewMode === "table" && (
-                <TableView
-                    tracks={tracks}
-                    page={page}
-                    totalPages={totalPages}
-                    onPageChange={setPage}
-                    seed={seed}
-                    activeTrackIndex={activeTrackIndex}
-                />
-            )}
+                {viewMode === "table" && (
+                    <TableView
+                        tracks={tracks}
+                        page={page}
+                        pageSize={10}
+                        totalPages={totalPages}
+                        onPageChange={setPage}
+                        seed={seed}
+                    />
+                )}
+            </div>
         </div>
     );
 }

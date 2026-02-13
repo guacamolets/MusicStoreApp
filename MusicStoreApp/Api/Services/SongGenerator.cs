@@ -7,7 +7,7 @@ namespace MusicStoreApp.Api.Services;
 public class SongGenerator
 {
     public IEnumerable<SongDto> Generate(
-        int index, int page, int pageSize, long userSeed, string locale, double avgLikes
+        int index, int page, int size, long userSeed, string locale, double avgLikes
     )
     {
         var contentSeed = SeedService.Combine(userSeed, page, index);
@@ -19,7 +19,7 @@ public class SongGenerator
         var normalizedLocale = locale.Split('-')[0];
         var faker = new Faker(normalizedLocale);
 
-        for (int i = 0; i < pageSize; i++)
+        for (int i = 0; i < size; i++)
         {
             var album = contentRandom.Next(0, 4) == 0
                 ? AlbumConfig.SingleByLocale.GetValueOrDefault(normalizedLocale, "Single")

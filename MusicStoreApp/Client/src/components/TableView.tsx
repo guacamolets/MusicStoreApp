@@ -1,39 +1,29 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import { type Track } from "./Track";
 
 interface Props {
     tracks: Track[];
     page: number;
     totalPages: number;
+    pageSize: number;
     onPageChange: (newPage: number) => void;
     seed: number;
-    activeTrackIndex: number | null;
 }
 
-export default function TableView({ tracks, page, totalPages, onPageChange, activeTrackIndex }: Props) {
+export default function TableView({ tracks, page, totalPages, onPageChange, pageSize = 10 }: Props) {
     const [expandedId, setExpandedId] = useState<number | null>(null);
-
-    const audioRefs = useRef<(HTMLAudioElement | null)[]>([]);
-
-    useEffect(() => {
-        audioRefs.current.forEach((audio, index) => {
-            if (!audio) return;
-            if (index === activeTrackIndex) {
-                audio.play().catch(() => { });
-            } else {
-                audio.pause();
-                audio.currentTime = 0;
-            }
-        });
-    }, [activeTrackIndex]);
 
     const toggleRow = (id: number) => {
         setExpandedId(prev => (prev === id ? null : id));
     };
 
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const tracksToDisplay = tracks.slice(startIndex, endIndex);
+
     return (
-        <div>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ width: "100%" }}> 
+            <table style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse" }}>
                 <thead>
                     <tr>
                         <th>#</th>
@@ -45,11 +35,11 @@ export default function TableView({ tracks, page, totalPages, onPageChange, acti
                     </tr>
                 </thead>
                 <tbody>
-                    {tracks.map((track, index) => (
+                    {tracksToDisplay.map((track, index) => (
                         <React.Fragment key={track.index}>
 
                             <tr onClick={() => toggleRow(track.index)} style={{ cursor: "pointer" }}>
-                                <td>{index + 1}</td>
+                                <td>{startIndex + index + 1}</td>
                                 <td>{track.title}</td>
                                 <td>{track.artist}</td>
                                 <td>{track.album}</td>
@@ -59,9 +49,9 @@ export default function TableView({ tracks, page, totalPages, onPageChange, acti
 
                             {expandedId === track.index && (
                                 <tr>
-                                    <td colSpan={5}>
+                                    <td colSpan={6}>
 
-                                        <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
+                                        <div style={{ display: "flex", gap: "20px", padding: "20px", justifyContent: "center" }}>
                                             <div>
                                                 <img src={track.coverUrl} alt={track.title} width={200} height={200} />
                                                 <div><strong>{track.title}</strong></div>
@@ -69,14 +59,9 @@ export default function TableView({ tracks, page, totalPages, onPageChange, acti
                                             </div>
 
                                             <div>
-                                                <button>
-                                                    <audio
-                                                        ref={(el) => { audioRefs.current[track.index] = el; }} controls src={track.audioUrl}
-                                                        style={{ width: "100%" }}
-                                                    >
-                                                        Your browser does not support the audio element.
-                                                    </audio>
-                                                </button>
+                                                <audio controls src={track.audioUrl} style={{ width: "100%" }}>
+                                                    Your browser does not support the audio element.
+                                                </audio>
 
                                                 <p style={{ marginTop: "15px" }}>
                                                     <strong>Review:</strong> {track.reviewText}
@@ -95,13 +80,13 @@ export default function TableView({ tracks, page, totalPages, onPageChange, acti
             </table>
 
             <div style={{ marginTop: "10px" }}>
-                <button onClick={() => onPageChange(page - 1)} disabled={page <= 1}>
+                <button onClick={() => onPageChange(Math.max(1, page - 1))} disabled={page <= 1}>
                     Previous
                 </button>
                 <span style={{ margin: "0 10px" }}>
                     Page {page} of {totalPages}
                 </span>
-                <button onClick={() => onPageChange(page + 1)} disabled={page >= totalPages}>
+                <button onClick={() => onPageChange(Math.min(totalPages, page + 1))} disabled={page >= totalPages}>
                     Next
                 </button>
             </div>

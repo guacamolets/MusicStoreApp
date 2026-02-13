@@ -1,13 +1,13 @@
 import React from "react";
 
-interface ToolbarProps {
+interface Props {
     language: string;
     seed: number;
     likes: number;
     onChange: (params: { language: string; seed: number; likes: number }) => void;
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({ language, seed, likes, onChange }) => {
+export default function Toolbar({ language, seed, likes, onChange } : Props) {
     const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         onChange({ language: e.target.value, seed, likes });
     };
@@ -17,7 +17,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ language, seed, likes, onChange }) =>
     };
 
     const handleLikesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onChange({ language, seed, likes: Number(e.target.value) });
+        onChange({ language, seed, likes: Math.min(10, Math.max(0, Number(e.target.value))) });
     };
 
     return (
@@ -62,5 +62,3 @@ const Toolbar: React.FC<ToolbarProps> = ({ language, seed, likes, onChange }) =>
         </div>
     );
 };
-
-export default Toolbar;

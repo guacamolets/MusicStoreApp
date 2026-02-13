@@ -18,14 +18,15 @@ public class SongsController : ControllerBase
     [HttpGet]
     public IActionResult GetSongs(
         int page = 1,
-        int pageSize = 20,
+        int pageSize = 10,
+        int size = 30,
         long seed = 1,
         string lang = "en",
         double likes = 0
     )
     {
-        var songs = _generator.Generate((page - 1) * pageSize + 1, page, pageSize, seed, lang, likes);
+        var songs = _generator.Generate((page - 1) * pageSize + 1, page, size, seed, lang, likes);
 
-        return Ok(new SongsPageDto { Songs = songs, TotalPages = pageSize });
+        return Ok(new SongsPageDto { Songs = songs, TotalPages = (int)Math.Ceiling((double)songs.Count() / pageSize) });
     }
 }

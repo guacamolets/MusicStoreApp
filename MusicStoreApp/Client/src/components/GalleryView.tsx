@@ -6,14 +6,14 @@ interface Props {
     likes: number;
     language: string;
     pageSize?: number;
-    activeTrackIndex: number | null;
 }
 
-export default function GalleryView({ seed, likes, language, pageSize = 10, activeTrackIndex }: Props) {
+export default function GalleryView({ seed, likes, language, pageSize = 10 }: Props) {
     const [tracks, setTracks] = useState<Track[]>([]);
     const [page, setPage] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
+    const [activeTrackIndex, setActiveTrackIndex] = useState<number | null>(null);
 
     const observerRef = useRef<HTMLDivElement | null>(null);
     const audioRefs = useRef<(HTMLAudioElement | null)[]>([]);
@@ -24,7 +24,7 @@ export default function GalleryView({ seed, likes, language, pageSize = 10, acti
         setIsLoading(true);
         try {
             const res = await fetch(
-                `/api/songs?seed=${seed}&likes=${likes}&lang=${language}&page=${page}&pageSize=${pageSize}`
+                `/api/songs?seed=${seed}&likes=${likes}&lang=${language}&page=${page}`
             );
             const data = await res.json();
             const newTracks: Track[] = (data.songs as Track[]).map((t: Track) => ({
@@ -91,7 +91,7 @@ export default function GalleryView({ seed, likes, language, pageSize = 10, acti
                     </div>
                     <audio
                         ref={(el) => { audioRefs.current[track.index] = el; }} controls src={track.audioUrl}
-                        style={{ width: "100%", marginTop: "auto" }}
+                        onPlay={() => setActiveTrackIndex(track.index)} style={{ width: "100%", marginTop: "auto" }} 
                     >
                         Your browser does not support the audio element.
                     </audio>
