@@ -25,7 +25,6 @@
   </ItemGroup>
 
 <ItemGroup>
-    <None Include="Client\src\pages\MusicPage.tsx~RF7699e13c.TMP" />
     <None Include="wwwroot\soundfonts\general.sf2" CopyToOutputDirectory="Always" />
 </ItemGroup>
 

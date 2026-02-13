@@ -18,7 +18,7 @@ public class MusicController : ControllerBase
     [HttpGet("mp3")]
     public IActionResult GetMp3(int seed = 1, int trackIndex = 1)
     {
-        var mp3 = _generator.GenerateMp3(seed);
+        var mp3 = _generator.GenerateMp3(seed, trackIndex);
         return File(mp3, "audio/mpeg", $"song_{seed}.mp3");
     }
 

@@ -6,14 +6,17 @@ interface Props {
     likes: number;
     language: string;
     pageSize?: number;
+    activeTrackIndex: number | null;
 }
 
-export default function GalleryView({ seed, likes, language, pageSize = 10 }: Props) {
+export default function GalleryView({ seed, likes, language, pageSize = 10, activeTrackIndex }: Props) {
     const [tracks, setTracks] = useState<Track[]>([]);
     const [page, setPage] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
+
     const observerRef = useRef<HTMLDivElement | null>(null);
+    const audioRefs = useRef<(HTMLAudioElement | null)[]>([]);
 
     const fetchTracks = useCallback(async () => {
         if (isLoading || !hasMore) return;
@@ -43,6 +46,18 @@ export default function GalleryView({ seed, likes, language, pageSize = 10 }: Pr
     }, [seed, likes, language, page, pageSize, isLoading, hasMore]);
 
     useEffect(() => {
+        audioRefs.current.forEach((audio, index) => {
+            if (!audio) return;
+            if (index === activeTrackIndex) {
+                audio.play().catch(() => { });
+            } else {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+        });
+    }, [activeTrackIndex]);
+
+    useEffect(() => {
         setTracks([]);
         setPage(1);
         setHasMore(true);
@@ -63,16 +78,21 @@ export default function GalleryView({ seed, likes, language, pageSize = 10 }: Pr
     }, [fetchTracks]);
 
     return (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "flex-start" }}>
             {tracks.map((track) => (
-                <div key={track.index} style={{width: "200px", border: "1px solid #ccc", padding: "10px", borderRadius: "8px"}}>
-                    <img src={track.coverUrl} alt={track.album} style={{ width: "100%", height: "auto" }}/>
-                    <h4>{track.title}</h4>
-                    <p>{track.artist}</p>
-                    <p>{track.album}</p>
-                    <p>{track.genre}</p>
-                    <p>Likes: {track.likes}</p>
-                    <audio controls src={track.audioUrl} style={{ width: "100%" }}>
+                <div key={track.index} style={{ display: "flex", flex: "1 0 200px", flexDirection: "column", width: "200px", border: "1px solid #ccc", padding: "10px", borderRadius: "8px"}}>
+                    <img src={track.coverUrl} alt={track.album} style={{ width: "100%", height: "auto", objectFit: "cover" }}/>
+                    <div style={{ textAlign: "center", marginTop: "10px", marginBottom: "10px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                        <strong>{track.index}. {track.title}</strong>
+                        <span>{track.artist}</span>
+                        <span>{track.album}</span>
+                        <span>{track.genre}</span>
+                        <span>Likes: {track.likes}</span>
+                    </div>
+                    <audio
+                        ref={(el) => { audioRefs.current[track.index] = el; }} controls src={track.audioUrl}
+                        style={{ width: "100%", marginTop: "auto" }}
+                    >
                         Your browser does not support the audio element.
                     </audio>
                 </div>

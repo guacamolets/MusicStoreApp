@@ -13,7 +13,14 @@ export default function MusicPage() {
     const [tracks, setTracks] = useState<Track[]>([]);
     const [totalPages, setTotalPages] = useState(1);
 
-    const [viewMode, setViewMode] = useState<"table" | "gallery">("table");
+    const [activeTrackIndex, setActiveTrackIndex] = useState<number | null>(null);
+    const [viewMode, setViewMode] = useState<"table" | "gallery">(
+        () => (localStorage.getItem("viewMode") as "table" | "gallery") || "table"
+    );
+
+    useEffect(() => {
+        localStorage.setItem("viewMode", viewMode);
+    }, [viewMode]);
 
     useEffect(() => {
         const fetchTracks = async () => {
@@ -30,6 +37,7 @@ export default function MusicPage() {
 
                 setTracks(tracksWithAudio);
                 setTotalPages(data.totalPages);
+                setActiveTrackIndex(null);
             } catch (err) {
                 console.error("Failed to fetch tracks", err);
             }
@@ -63,6 +71,7 @@ export default function MusicPage() {
                     seed={seed}
                     likes={likes}
                     language={language}
+                    activeTrackIndex={activeTrackIndex}
                 />
             )}
 
@@ -73,6 +82,7 @@ export default function MusicPage() {
                     totalPages={totalPages}
                     onPageChange={setPage}
                     seed={seed}
+                    activeTrackIndex={activeTrackIndex}
                 />
             )}
         </div>

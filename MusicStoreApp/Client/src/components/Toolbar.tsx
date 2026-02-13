@@ -34,7 +34,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ language, seed, likes, onChange }) =>
                 <label>Language: </label>
                 <select value={language} onChange={handleLanguageChange}>
                     <option value="en">English</option>
-                    <option value="uk">Ukrainian</option>
+                    <option value="ru">Russian</option>
                 </select>
             </div>
 

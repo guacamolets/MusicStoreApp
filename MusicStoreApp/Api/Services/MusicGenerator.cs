@@ -9,11 +9,11 @@ namespace MusicStoreApp.Api.Services
 {
     public class MusicGenerator
     {
-        public byte[] GenerateMp3(int seed = 1)
+        public byte[] GenerateMp3(int seed = 1, int index = 1)
         {
             const int sampleRate = 44100;
 
-            byte[] midiBytes = GenerateMidi(seed);
+            byte[] midiBytes = GenerateMidi(seed + index);
 
             using var midiStream = new MemoryStream(midiBytes);
             var midiFile = new MeltySynth.MidiFile(midiStream);
