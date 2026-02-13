@@ -19,13 +19,13 @@ export default function MusicPage() {
         const fetchTracks = async () => {
             try {
                 const res = await fetch(
-                    `https://localhost:7196/api/songs?seed=${seed}&likes=${likes}&lang=${language}&page=${page}&pageSize=${10}`
+                    `/api/songs?seed=${seed}&likes=${likes}&lang=${language}&page=${page}&pageSize=${10}`
                 );
                 const data = await res.json();
 
                 const tracksWithAudio: Track[] = (data.songs as Track[]).map(t => ({
                     ...t,
-                    audioUrl: `https://localhost:7196/api/music/mp3?seed=${seed}&trackIndex=${t.index}`
+                    audioUrl: `/api/music/mp3?seed=${seed}&trackIndex=${t.index}`
                 }));
 
                 setTracks(tracksWithAudio);

@@ -21,12 +21,12 @@ export default function GalleryView({ seed, likes, language, pageSize = 10 }: Pr
         setIsLoading(true);
         try {
             const res = await fetch(
-                `https://localhost:7196/api/songs?seed=${seed}&likes=${likes}&lang=${language}&page=${page}&pageSize=${pageSize}`
+                `/api/songs?seed=${seed}&likes=${likes}&lang=${language}&page=${page}&pageSize=${pageSize}`
             );
             const data = await res.json();
             const newTracks: Track[] = (data.songs as Track[]).map((t: Track) => ({
                 ...t,
-                audioUrl: `https://localhost:7196/api/music/mp3?seed=${seed}&trackIndex=${t.index}`,
+                audioUrl: `/api/music/mp3?seed=${seed}&trackIndex=${t.index}`,
             }));
 
             setTracks((prev) => [...prev, ...newTracks]);
